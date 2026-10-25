@@ -1,122 +1,128 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import NotFound from './pages/NotFound';
+import PlaceholderPage from './pages/PlaceholderPage';
+
+import { Tag, PlusCircle, ArrowLeftRight, MessageSquare, CheckCircle2, Shield } from 'lucide-react';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Router>
+      <AuthProvider>
+        <div className="app-container">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-      <div className="ticks"></div>
+              {/* Protected Student Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route
+                  path="/my-listings"
+                  element={
+                    <PlaceholderPage
+                      title="My Campus Listings"
+                      phase="Phase 2: Listings & Search"
+                      description="Manage all your active, reserved, and sold listings, edit descriptions, and track buyer interest."
+                      icon={Tag}
+                    />
+                  }
+                />
+                <Route
+                  path="/listings/create"
+                  element={
+                    <PlaceholderPage
+                      title="List an Item"
+                      phase="Phase 2: Listings & Cloudinary"
+                      description="Upload up to 5 photos, set price or swap requirements, condition, and category."
+                      icon={PlusCircle}
+                    />
+                  }
+                />
+                <Route
+                  path="/my-offers"
+                  element={
+                    <PlaceholderPage
+                      title="Structured Offers & Counters"
+                      phase="Phase 3: State Machine"
+                      description="Review incoming and sent offers. Accept offers with atomic reservation or negotiate with linked counter-offers."
+                      icon={ArrowLeftRight}
+                    />
+                  }
+                />
+                <Route
+                  path="/inbox"
+                  element={
+                    <PlaceholderPage
+                      title="Real-Time Campus Chat"
+                      phase="Phase 4: Socket.io Chat"
+                      description="Private, authenticated chat per listing with instant notifications and system transaction logs."
+                      icon={MessageSquare}
+                    />
+                  }
+                />
+                <Route
+                  path="/deals"
+                  element={
+                    <PlaceholderPage
+                      title="Verified Deal Completion"
+                      phase="Phase 5: Mutual Handover"
+                      description="Coordinate physical item handovers on campus. Both buyer and seller confirm handover before rating each other."
+                      icon={CheckCircle2}
+                    />
+                  }
+                />
+              </Route>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+              {/* Admin Routes */}
+              <Route element={<AdminRoute />}>
+                <Route
+                  path="/admin"
+                  element={
+                    <PlaceholderPage
+                      title="Moderator Dashboard"
+                      phase="Phase 6: Admin Moderation"
+                      description="Review community reports, remove inappropriate listings, and suspend banned users."
+                      icon={Shield}
+                    />
+                  }
+                />
+              </Route>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+              {/* 404 Catch-All */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+
+          {/* Minimalist modern footer */}
+          <footer style={{
+            borderTop: '1px solid var(--border-subtle)',
+            padding: '2rem 1.5rem',
+            background: 'var(--bg-primary)',
+            color: 'var(--text-muted)',
+            fontSize: '0.8125rem',
+            textAlign: 'center'
+          }}>
+            <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <p>© 2026 CampusSwap — College Buy, Sell & Swap Marketplace</p>
+              <p>MERN Stack • Socket.io • Cloudinary • Atomic Concurrency</p>
+            </div>
+          </footer>
+        </div>
+      </AuthProvider>
+    </Router>
+  );
 }
 
-export default App
+export default App;
