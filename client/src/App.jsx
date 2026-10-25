@@ -23,6 +23,7 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
+              <Route path="/shop" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
@@ -108,15 +109,15 @@ function App() {
           {/* Minimalist modern footer */}
           <footer style={{
             borderTop: '1px solid var(--border-subtle)',
-            padding: '2rem 1.5rem',
-            background: 'var(--bg-primary)',
+            padding: '1.75rem 1.5rem',
+            background: '#ffffff',
             color: 'var(--text-muted)',
             fontSize: '0.8125rem',
             textAlign: 'center'
           }}>
-            <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-              <p>© 2026 CampusSwap — College Buy, Sell & Swap Marketplace</p>
-              <p>MERN Stack • Socket.io • Cloudinary • Atomic Concurrency</p>
+            <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <p style={{ fontWeight: '500' }}>© 2026 Shop — Campus Marketplace</p>
+              <p>MERN • Real-Time Chat • Atomic Offers</p>
             </div>
           </footer>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, ShoppingBag } from 'lucide-react';
 
 const Login = () => {
   const { login } = useAuth();
@@ -55,78 +55,77 @@ const Login = () => {
 
   return (
     <div style={{
-      minHeight: 'calc(100vh - 4.25rem)',
+      minHeight: 'calc(100vh - 4.5rem)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '2rem 1rem',
-      background: 'radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 70%)'
+      backgroundColor: 'var(--bg-primary)',
     }}>
-      <div className="glass-panel animate-fade-in" style={{
+      <div className="card animate-fade-in" style={{
         width: '100%',
-        maxWidth: '440px',
+        maxWidth: '420px',
         padding: '2.5rem 2rem',
-        boxShadow: 'var(--shadow-lg)'
+        borderRadius: 'var(--radius-xl)',
+        boxShadow: 'var(--shadow-md)',
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.25rem 0.75rem',
+            justifyContent: 'center',
+            width: '3rem',
+            height: '3rem',
             borderRadius: 'var(--radius-full)',
-            background: 'var(--brand-gradient-subtle)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
-            marginBottom: '0.75rem'
+            background: 'var(--brand-primary-light)',
+            color: 'var(--brand-primary)',
+            marginBottom: '1rem',
           }}>
-            <Sparkles size={14} color="#818cf8" />
-            <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#a5b4fc' }}>
-              Campus Community Portal
-            </span>
+            <ShoppingBag size={24} strokeWidth={2.4} />
           </div>
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '1.625rem', marginBottom: '0.35rem', color: 'var(--text-main)' }}>
             Welcome Back
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            Sign in to manage your listings, chat, and offers
+            Sign in to your campus account
           </p>
         </div>
 
-        {/* Quick Demo Credentials Bar */}
+        {/* Demo Fast Login Pills */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px dashed var(--border-subtle)',
+          background: '#f8fafc',
+          border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-md)',
           padding: '0.75rem',
           marginBottom: '1.5rem',
-          textAlign: 'center'
+          textAlign: 'center',
         }}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: '500' }}>
-            ⚡ Evaluator Demo Quick-Fill:
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: '600' }}>
+            ⚡ Demo Quick Fill:
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
             <button
               type="button"
               onClick={() => handleQuickFill('student1')}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+              className="chip"
+              style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}
             >
-              Student 1 (Rahul)
+              Rahul (Student)
             </button>
             <button
               type="button"
               onClick={() => handleQuickFill('student2')}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+              className="chip"
+              style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}
             >
-              Student 2 (Priya)
+              Priya (Student)
             </button>
             <button
               type="button"
               onClick={() => handleQuickFill('admin')}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+              className="chip"
+              style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}
             >
               Admin
             </button>
@@ -169,11 +168,9 @@ const Login = () => {
           </div>
 
           <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label className="form-label" htmlFor="password">
-                Password
-              </label>
-            </div>
+            <label className="form-label" htmlFor="password">
+              Password
+            </label>
             <div style={{ position: 'relative' }}>
               <input
                 id="password"
@@ -205,7 +202,7 @@ const Login = () => {
                   color: 'var(--text-muted)',
                   cursor: 'pointer',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
                 }}
                 aria-label="Toggle password visibility"
               >
@@ -218,28 +215,25 @@ const Login = () => {
             type="submit"
             disabled={loading}
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.8rem', marginTop: '0.5rem', fontSize: '0.9375rem' }}
+            style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', fontSize: '0.9375rem' }}
           >
             {loading ? (
-              <>
-                <div className="spinner"></div>
-                <span>Signing in...</span>
-              </>
+              <div className="spinner"></div>
             ) : (
               <>
                 <span>Sign In</span>
-                <ArrowRight size={18} />
+                <ArrowRight size={16} />
               </>
             )}
           </button>
         </form>
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            New to CampusSwap?{' '}
+            Don't have an account?{' '}
             <Link to="/register" style={{ color: 'var(--brand-primary)', fontWeight: '600' }}>
-              Create an account
+              Sign up
             </Link>
           </p>
         </div>

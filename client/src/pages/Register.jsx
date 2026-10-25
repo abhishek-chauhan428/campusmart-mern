@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, School, Lock, Eye, EyeOff, AlertCircle, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import { User, Mail, School, Lock, Eye, EyeOff, AlertCircle, ArrowRight, ShoppingBag } from 'lucide-react';
 
 const campuses = [
   'Delhi Technological University',
   'IIT Delhi',
   'BITS Pilani',
-  'Manipal Institute of Tech',
+  'Manipal Tech',
   'VIT Vellore',
 ];
 
@@ -46,7 +46,6 @@ const Register = () => {
     setErrorMessage('');
     setValidationErrors([]);
 
-    // Client-side validations
     if (formData.password.length < 6) {
       setErrorMessage('Password must be at least 6 characters long');
       return;
@@ -78,41 +77,40 @@ const Register = () => {
 
   return (
     <div style={{
-      minHeight: 'calc(100vh - 4.25rem)',
+      minHeight: 'calc(100vh - 4.5rem)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '2rem 1rem',
-      background: 'radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 70%)'
+      backgroundColor: 'var(--bg-primary)',
     }}>
-      <div className="glass-panel animate-fade-in" style={{
+      <div className="card animate-fade-in" style={{
         width: '100%',
-        maxWidth: '480px',
+        maxWidth: '460px',
         padding: '2.5rem 2rem',
-        boxShadow: 'var(--shadow-lg)'
+        borderRadius: 'var(--radius-xl)',
+        boxShadow: 'var(--shadow-md)',
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.25rem 0.75rem',
+            justifyContent: 'center',
+            width: '3rem',
+            height: '3rem',
             borderRadius: 'var(--radius-full)',
-            background: 'var(--brand-gradient-subtle)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
-            marginBottom: '0.75rem'
+            background: 'var(--brand-primary-light)',
+            color: 'var(--brand-primary)',
+            marginBottom: '1rem',
           }}>
-            <Sparkles size={14} color="#818cf8" />
-            <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#a5b4fc' }}>
-              Join Campus Community
-            </span>
+            <ShoppingBag size={24} strokeWidth={2.4} />
           </div>
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
-            Create Your Account
+          <h1 style={{ fontSize: '1.625rem', marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+            Create Account
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            Trade safely with students from your campus
+            Buy, sell, and swap with students on your campus
           </p>
         </div>
 
@@ -121,15 +119,6 @@ const Register = () => {
           <div className="alert alert-error animate-fade-in" style={{ display: 'flex', alignItems: 'center' }}>
             <AlertCircle size={18} style={{ flexShrink: 0 }} />
             <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* Validation Errors List */}
-        {validationErrors.length > 0 && (
-          <div className="alert alert-error animate-fade-in" style={{ flexDirection: 'column', gap: '0.25rem' }}>
-            {validationErrors.map((err, idx) => (
-              <div key={idx} style={{ fontSize: '0.8125rem' }}>• {err.message}</div>
-            ))}
           </div>
         )}
 
@@ -162,7 +151,7 @@ const Register = () => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="email">
-              Campus Email Address
+              College Email Address
             </label>
             <div style={{ position: 'relative' }}>
               <input
@@ -171,7 +160,7 @@ const Register = () => {
                 type="email"
                 required
                 className="form-input"
-                placeholder="student@campus.edu"
+                placeholder="you@campus.edu"
                 value={formData.email}
                 onChange={handleChange}
                 style={{ paddingLeft: '2.5rem' }}
@@ -187,9 +176,9 @@ const Register = () => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="college">
-              Campus / College / University
+              Campus / College
             </label>
-            <div style={{ position: 'relative', marginBottom: '0.5rem' }}>
+            <div style={{ position: 'relative', marginBottom: '0.4rem' }}>
               <input
                 id="college"
                 name="college"
@@ -207,7 +196,7 @@ const Register = () => {
                 style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }}
               />
             </div>
-            
+
             {/* Quick Campus Chips */}
             <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
               {campuses.map((c) => (
@@ -215,14 +204,13 @@ const Register = () => {
                   type="button"
                   key={c}
                   onClick={() => handleSelectCampus(c)}
+                  className="chip"
                   style={{
-                    background: formData.college === c ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-                    color: formData.college === c ? '#a5b4fc' : 'var(--text-muted)',
-                    border: formData.college === c ? '1px solid var(--brand-primary)' : '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-full)',
                     padding: '0.15rem 0.5rem',
                     fontSize: '0.7rem',
-                    cursor: 'pointer'
+                    background: formData.college === c ? 'var(--brand-primary-light)' : '#f1f5f9',
+                    color: formData.college === c ? 'var(--brand-primary)' : 'var(--text-secondary)',
+                    borderColor: formData.college === c ? 'var(--brand-primary)' : 'var(--border-subtle)',
                   }}
                 >
                   {c.split(' ')[0]}
@@ -233,7 +221,7 @@ const Register = () => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="password">
-              Password (min 6 characters)
+              Password (min 6 chars)
             </label>
             <div style={{ position: 'relative' }}>
               <input
@@ -266,7 +254,7 @@ const Register = () => {
                   color: 'var(--text-muted)',
                   cursor: 'pointer',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
                 }}
                 aria-label="Toggle password visibility"
               >
@@ -304,28 +292,25 @@ const Register = () => {
             type="submit"
             disabled={loading}
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.8rem', marginTop: '0.75rem', fontSize: '0.9375rem' }}
+            style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', fontSize: '0.9375rem' }}
           >
             {loading ? (
-              <>
-                <div className="spinner"></div>
-                <span>Creating Account...</span>
-              </>
+              <div className="spinner"></div>
             ) : (
               <>
-                <span>Complete Registration</span>
-                <ArrowRight size={18} />
+                <span>Create Account</span>
+                <ArrowRight size={16} />
               </>
             )}
           </button>
         </form>
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             Already have an account?{' '}
             <Link to="/login" style={{ color: 'var(--brand-primary)', fontWeight: '600' }}>
-              Sign in here
+              Sign in
             </Link>
           </p>
         </div>
