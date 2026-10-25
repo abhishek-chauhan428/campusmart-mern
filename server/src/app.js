@@ -49,6 +49,9 @@ app.get('/api/health', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
+const listingRoutes = require('./routes/listingRoutes');
+app.use('/api/listings', listingRoutes);
+
 // 404 handler for unmatched routes
 app.use((req, res, next) => {
   res.status(404).json({

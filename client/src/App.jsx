@@ -10,8 +10,11 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import PlaceholderPage from './pages/PlaceholderPage';
+import ListingDetail from './pages/ListingDetail';
+import CreateListing from './pages/CreateListing';
+import MyListings from './pages/MyListings';
 
-import { Tag, PlusCircle, ArrowLeftRight, MessageSquare, CheckCircle2, Shield } from 'lucide-react';
+import { ArrowLeftRight, MessageSquare, CheckCircle2, Shield } from 'lucide-react';
 
 function App() {
   return (
@@ -26,31 +29,13 @@ function App() {
               <Route path="/shop" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/listings/:id" element={<ListingDetail />} />
 
               {/* Protected Student Routes */}
               <Route element={<ProtectedRoute />}>
-                <Route
-                  path="/my-listings"
-                  element={
-                    <PlaceholderPage
-                      title="My Campus Listings"
-                      phase="Phase 2: Listings & Search"
-                      description="Manage all your active, reserved, and sold listings, edit descriptions, and track buyer interest."
-                      icon={Tag}
-                    />
-                  }
-                />
-                <Route
-                  path="/listings/create"
-                  element={
-                    <PlaceholderPage
-                      title="List an Item"
-                      phase="Phase 2: Listings & Cloudinary"
-                      description="Upload up to 5 photos, set price or swap requirements, condition, and category."
-                      icon={PlusCircle}
-                    />
-                  }
-                />
+                <Route path="/my-listings" element={<MyListings />} />
+                <Route path="/listings/create" element={<CreateListing />} />
+                <Route path="/listings/:id/edit" element={<CreateListing />} />
                 <Route
                   path="/my-offers"
                   element={

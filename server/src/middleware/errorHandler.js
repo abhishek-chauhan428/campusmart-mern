@@ -36,6 +36,18 @@ const errorHandler = (err, req, res, next) => {
     }));
   }
 
+  // Handle Multer (file upload) errors
+  if (err.name === 'MulterError') {
+    statusCode = 400;
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      message = 'Each image must be 5 MB or smaller';
+    } else if (err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE') {
+      message = 'You can upload a maximum of 5 images';
+    } else {
+      message = err.message;
+    }
+  }
+
   // Handle JWT errors
   if (err.name === 'JsonWebTokenError') {
     statusCode = 401;
