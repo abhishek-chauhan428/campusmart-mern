@@ -126,7 +126,7 @@ const Home = () => {
                 marginBottom: '0.75rem',
                 textShadow: '0 1px 2px rgba(0,0,0,0.1)'
               }}>
-                ONLY THIS WEEK
+                CAMPUS MARKETPLACE
               </span>
 
               <h1 style={{
@@ -139,17 +139,17 @@ const Home = () => {
                 marginBottom: '0.5rem',
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}>
-                ULTIMATE DISCOUNT SALE
+                BUY & SELL ON CAMPUS
               </h1>
 
               <div style={{
-                fontSize: 'clamp(1.25rem, 2.2vw, 1.75rem)',
+                fontSize: 'clamp(1.15rem, 2vw, 1.5rem)',
                 fontWeight: '800',
                 color: '#ffffff',
-                marginBottom: '0.25rem',
+                marginBottom: '0.35rem',
                 textShadow: '0 1px 3px rgba(0,0,0,0.1)'
               }}>
-                UP TO 50% OFF
+                DIRECT CHAT • FORMAL OFFERS
               </div>
 
               <p style={{
@@ -160,25 +160,27 @@ const Home = () => {
                 textTransform: 'uppercase',
                 marginBottom: '1.75rem'
               }}>
-                FREE HANDOVER ACROSS CAMPUS
+                ATOMIC RESERVATION & VERIFIED HANDOVERS
               </p>
 
-              <Link
-                to={isAuthenticated ? "/listings/create" : "/login"}
-                className="btn"
-                style={{
-                  background: '#ffffff',
-                  color: 'var(--brand-primary)',
-                  fontWeight: '700',
-                  padding: '0.75rem 1.75rem',
-                  borderRadius: 'var(--radius-full)',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                  fontSize: '0.9375rem'
-                }}
-              >
-                <span>{isAuthenticated ? 'Sell an Item' : 'Shop Now'}</span>
-                <ArrowRight size={16} />
-              </Link>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <Link
+                  to={isAuthenticated ? "/listings/create" : "/login"}
+                  className="btn"
+                  style={{
+                    background: '#ffffff',
+                    color: 'var(--brand-primary)',
+                    fontWeight: '700',
+                    padding: '0.75rem 1.75rem',
+                    borderRadius: 'var(--radius-full)',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+                    fontSize: '0.9375rem'
+                  }}
+                >
+                  <span>Sell an Item</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
 
             {/* Right Banner Image */}

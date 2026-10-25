@@ -52,7 +52,7 @@ const Navbar = () => {
             color: 'var(--brand-primary)',
             fontFamily: 'var(--font-heading)'
           }}>
-            Shop
+            CampusMart
           </span>
         </Link>
 
