@@ -74,7 +74,6 @@ const Navbar = () => {
                 Offers
               </NavLink>
               <NavLink to="/inbox" className={navLinkClass}>
-                Chat
               </NavLink>
               <NavLink to="/deals" className={navLinkClass}>
                 Deals
@@ -231,7 +230,6 @@ const Navbar = () => {
                 Offers
               </Link>
               <Link to="/inbox" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)' }}>
-                Chat
               </Link>
               <Link to="/deals" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)' }}>
                 Deals
