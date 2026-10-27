@@ -10,6 +10,9 @@ const {
   listingQuerySchema,
 } = require('../middleware/validate');
 const {
+  createOffer,
+} = require('../controllers/offerController');
+const {
   getListings,
   getMyListings,
   getListingById,
@@ -28,7 +31,12 @@ router.get('/mine', protect, getMyListings);
 
 // multer runs first so req.body is populated before zod validates it
 router.post('/', protect, uploadListingImages, validate(createListingSchema), createListing);
-
+router.post(
+  '/:id/offers',
+  protect,
+  validateObjectId('id'),
+  createOffer
+);
 router.get('/:id', validateObjectId('id'), getListingById);
 router.put('/:id', protect, validateObjectId('id'), uploadListingImages, validate(updateListingSchema), updateListing);
 router.delete('/:id', protect, validateObjectId('id'), deleteListing);

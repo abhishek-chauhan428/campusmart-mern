@@ -52,6 +52,12 @@ app.use('/api/auth', authRoutes);
 const listingRoutes = require('./routes/listingRoutes');
 app.use('/api/listings', listingRoutes);
 
+const offerRoutes = require('./routes/offerRoutes');
+app.use('/api/offers', offerRoutes);
+
+const dealRoutes = require('./routes/dealRoutes');
+app.use('/api/deals', dealRoutes);
+
 // 404 handler for unmatched routes
 app.use((req, res, next) => {
   res.status(404).json({

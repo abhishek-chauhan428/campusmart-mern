@@ -3,7 +3,7 @@ const http = require('http');
 const app = require('./app');
 const { connectDB, disconnectDB } = require('./config/db');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5555;
 
 // Create HTTP server (shared with Socket.io later)
 const server = http.createServer(app);
