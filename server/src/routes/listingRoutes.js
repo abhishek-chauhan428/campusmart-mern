@@ -23,8 +23,8 @@ const {
 
 const router = express.Router();
 
-// Public browse (active listings only)
-router.get('/', validateQuery(listingQuerySchema), getListings);
+// College-isolated browse (authenticated students only)
+router.get('/', protect, validateQuery(listingQuerySchema), getListings);
 
 // NOTE: '/mine' must be declared before '/:id'
 router.get('/mine', protect, getMyListings);
@@ -37,7 +37,7 @@ router.post(
   validateObjectId('id'),
   createOffer
 );
-router.get('/:id', validateObjectId('id'), getListingById);
+router.get('/:id', protect, validateObjectId('id'), getListingById);
 router.put('/:id', protect, validateObjectId('id'), uploadListingImages, validate(updateListingSchema), updateListing);
 router.delete('/:id', protect, validateObjectId('id'), deleteListing);
 

@@ -1,8 +1,10 @@
 const Listing = require('../models/Listing');
+const User = require('../models/User');
+const { getEmailDomain, isAllowedCollegeEmail } = require('../utils/college');
 const { uploadImages, deleteImages } = require('../services/imageService');
 const { MAX_IMAGES } = require('../constants/listing');
 
-const SELLER_FIELDS = 'name college ratingAvg ratingCount createdAt';
+const SELLER_FIELDS = 'name email college ratingAvg ratingCount createdAt';
 
 const fail = (res, status, message) => res.status(status).json({ success: false, message });
 
@@ -20,8 +22,24 @@ const getListings = async (req, res, next) => {
     const { search, category, condition, minPrice, maxPrice, page, limit } = req.validatedQuery;
     let { sort } = req.validatedQuery;
 
-    // The browse page only ever shows active listings
-    const filter = { status: 'active' };
+    // The marketplace is isolated by college email domain.
+    const studentDomain = getEmailDomain(req.user.email);
+
+    if (!studentDomain) {
+      return fail(res, 403, 'Your account does not have a valid college email domain');
+    }
+
+    const collegeUsers = await User.find({
+      email: { $regex: `@${studentDomain.replace(/[.*+?^${}()|[\\]\\]/g, '\\\\$&')}$`, $options: 'i' },
+    }).select('_id');
+
+    const collegeUserIds = collegeUsers.map((user) => user._id);
+
+    // The browse page only ever shows active listings from this college.
+    const filter = {
+      status: 'active',
+      seller: { $in: collegeUserIds },
+    };
     if (search) filter.$text = { $search: search };
     if (category) filter.category = category;
     if (condition) filter.condition = condition;
@@ -78,7 +96,16 @@ const getMyListings = async (req, res, next) => {
 const getListingById = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id).populate('seller', SELLER_FIELDS);
+
     if (!listing) return fail(res, 404, 'Listing not found');
+
+    const viewerDomain = getEmailDomain(req.user.email);
+    const sellerDomain = getEmailDomain(listing.seller?.email || '');
+
+    if (!viewerDomain || !sellerDomain || viewerDomain !== sellerDomain) {
+      return fail(res, 404, 'Listing not found');
+    }
+
     res.status(200).json({ success: true, listing });
   } catch (error) {
     next(error);
@@ -90,6 +117,10 @@ const getListingById = async (req, res, next) => {
 // @access  Private
 const createListing = async (req, res, next) => {
   try {
+    if (!isAllowedCollegeEmail(req.user.email)) {
+      return fail(res, 403, 'Only students with an allowed college email can create listings');
+    }
+
     const files = req.files || [];
     if (files.length === 0) return fail(res, 400, 'Please upload at least one image');
 
@@ -117,6 +148,10 @@ const createListing = async (req, res, next) => {
 const updateListing = async (req, res, next) => {
   let uploaded = [];
   try {
+    if (!isAllowedCollegeEmail(req.user.email)) {
+      return fail(res, 403, 'Only students with an allowed college email can update listings');
+    }
+
     const listing = await Listing.findById(req.params.id);
     if (!listing) return fail(res, 404, 'Listing not found');
     if (listing.seller.toString() !== req.user._id.toString()) {

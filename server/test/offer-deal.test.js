@@ -35,6 +35,7 @@ describe('Offers and Deals API', () => {
 
   before(async () => {
     process.env.NODE_ENV = 'test';
+    process.env.COLLEGE_EMAIL_DOMAINS = 'campus.edu';
     await connectDB();
     await Promise.all([
       User.deleteMany({}),
@@ -71,6 +72,28 @@ describe('Offers and Deals API', () => {
       body: JSON.stringify({ amount: 850, message: 'Duplicate pending offer' }),
     });
     assert.equal(second.status, 409);
+  });
+
+  it('blocks offers from a different college email domain', async () => {
+    const seller = await makeUser('seller-domain');
+    const buyer = await User.create({
+      name: 'Other College Buyer',
+      email: `buyer-${Date.now()}@othercollege.edu`,
+      passwordHash: await User.hashPassword('password123'),
+      college: 'Other College',
+    });
+    const listing = await makeListing(seller.user);
+
+    const res = await fetch(`${baseUrl}/listings/${listing.id}/offers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${generateToken(buyer)}` },
+      body: JSON.stringify({ amount: 900 }),
+    });
+
+    const data = await res.json();
+    assert.equal(res.status, 403);
+    assert.equal(res.status, 403);
+    assert.match(data.message, /college/i);
   });
 
   it('allows only the seller to accept an offer and creates a deal', async () => {

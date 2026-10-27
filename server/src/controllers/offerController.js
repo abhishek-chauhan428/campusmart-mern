@@ -1,6 +1,8 @@
 const Listing = require('../models/Listing');
 const Offer = require('../models/Offer');
 const Deal = require('../models/Deal');
+const User = require('../models/User');
+const { getEmailDomain } = require('../utils/college');
 
 const fail = (res, status, message) =>
   res.status(status).json({ success: false, message });
@@ -45,6 +47,16 @@ const createOffer = async (req, res, next) => {
     if (listing.seller.toString() === req.user._id.toString()) {
       return res.status(400).json({
         message: 'You cannot make an offer on your own listing',
+      });
+    }
+
+    const seller = await User.findById(listing.seller).select('email');
+    const buyerDomain = getEmailDomain(req.user.email);
+    const sellerDomain = getEmailDomain(seller?.email || '');
+
+    if (!buyerDomain || !sellerDomain || buyerDomain !== sellerDomain) {
+      return res.status(403).json({
+        message: 'You can only make offers on listings from your college',
       });
     }
 

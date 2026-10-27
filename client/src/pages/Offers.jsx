@@ -162,8 +162,8 @@ const Offers = () => {
         api.get('/offers/sent'),
       ]);
 
-      setReceived(receivedRes.data.offers || []);
-      setSent(sentRes.data.offers || []);
+      setReceived((receivedRes.data.offers || []).filter((offer) => offer.status !== 'withdrawn'));
+      setSent((sentRes.data.offers || []).filter((offer) => offer.status !== 'withdrawn'));
     } catch (err) {
       setActionError(getErrorMessage(err, 'Could not load offers.'));
     } finally {

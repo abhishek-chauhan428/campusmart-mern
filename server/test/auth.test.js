@@ -12,6 +12,7 @@ describe('Authentication & User Model Suite', () => {
 
   before(async () => {
     process.env.NODE_ENV = 'test';
+    process.env.COLLEGE_EMAIL_DOMAINS = 'campus.edu';
     await connectDB();
     await User.deleteMany({});
 
@@ -54,7 +55,25 @@ describe('Authentication & User Model Suite', () => {
     userToken = data.token;
   });
 
-  it('2. should reject duplicate email registration with 409 Conflict', async () => {
+  it('2. should reject registration outside the allowed college domain', async () => {
+    const res = await fetch(`${baseUrl}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Outside Student',
+        email: 'student@othercollege.edu',
+        password: 'password123',
+        college: 'Other College',
+      }),
+    });
+
+    const data = await res.json();
+    assert.strictEqual(res.status, 400);
+    assert.strictEqual(data.success, false);
+    assert.ok(data.message.includes('college email'));
+  });
+
+  it('3. should reject duplicate email registration with 409 Conflict', async () => {
     const res = await fetch(`${baseUrl}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -72,7 +91,7 @@ describe('Authentication & User Model Suite', () => {
     assert.ok(data.message.includes('already exists'));
   });
 
-  it('3. should reject invalid input with 400 Bad Request', async () => {
+  it('4. should reject invalid input with 400 Bad Request', async () => {
     const res = await fetch(`${baseUrl}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -90,7 +109,7 @@ describe('Authentication & User Model Suite', () => {
     assert.ok(Array.isArray(data.errors));
   });
 
-  it('4. should log in successfully with valid credentials', async () => {
+  it('5. should log in successfully with valid credentials', async () => {
     const res = await fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -108,7 +127,7 @@ describe('Authentication & User Model Suite', () => {
     assert.strictEqual(data.user.passwordHash, undefined);
   });
 
-  it('5. should reject login with invalid password with generic 401', async () => {
+  it('6. should reject login with invalid password with generic 401', async () => {
     const res = await fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -124,7 +143,7 @@ describe('Authentication & User Model Suite', () => {
     assert.strictEqual(data.message, 'Invalid email or password');
   });
 
-  it('6. should reject login with non-existent email with generic 401', async () => {
+  it('7. should reject login with non-existent email with generic 401', async () => {
     const res = await fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -140,7 +159,7 @@ describe('Authentication & User Model Suite', () => {
     assert.strictEqual(data.message, 'Invalid email or password');
   });
 
-  it('7. should fetch current user profile via GET /api/auth/me with Bearer token', async () => {
+  it('8. should fetch current user profile via GET /api/auth/me with Bearer token', async () => {
     const res = await fetch(`${baseUrl}/me`, {
       headers: {
         Authorization: `Bearer ${userToken}`,
@@ -154,14 +173,14 @@ describe('Authentication & User Model Suite', () => {
     assert.strictEqual(data.user.name, 'Rahul Sharma');
   });
 
-  it('8. should reject access to /api/auth/me without token (401)', async () => {
+  it('9. should reject access to /api/auth/me without token (401)', async () => {
     const res = await fetch(`${baseUrl}/me`);
     const data = await res.json();
     assert.strictEqual(res.status, 401);
     assert.strictEqual(data.success, false);
   });
 
-  it('9. should reject banned users with 403 Forbidden', async () => {
+  it('10. should reject banned users with 403 Forbidden', async () => {
     await User.updateOne({ email: 'rahul@campus.edu' }, { isBanned: true });
 
     // Try login

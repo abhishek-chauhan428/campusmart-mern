@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { isAllowedCollegeEmail } = require('../utils/college');
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -21,7 +22,15 @@ const register = async (req, res, next) => {
   try {
     const { name, email, password, college } = req.body;
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = email.toLowerCase();
+    if (!isAllowedCollegeEmail(normalizedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: `Please register using your college email address. Allowed domains: ${String(process.env.COLLEGE_EMAIL_DOMAINS || '').split(',').map((d) => d.trim()).filter(Boolean).join(', ') || 'not configured'}`,
+      });
+    }
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -33,7 +42,7 @@ const register = async (req, res, next) => {
 
     const user = await User.create({
       name,
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       passwordHash,
       college,
     });
@@ -58,7 +67,16 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
+    const normalizedEmail = email.toLowerCase();
+
+    if (!isAllowedCollegeEmail(normalizedEmail)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password',
+      });
+    }
+
+    const user = await User.findOne({ email: normalizedEmail }).select('+passwordHash');
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -108,9 +126,25 @@ const getMe = async (req, res, next) => {
   }
 };
 
+// @desc    Get public profile for any user by ID
+// @route   GET /api/auth/users/:id
+// @access  Public
+const getPublicProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).select('name college ratingAvg ratingCount createdAt');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
+  getPublicProfile,
   generateToken,
 };

@@ -58,6 +58,28 @@ app.use('/api/offers', offerRoutes);
 const dealRoutes = require('./routes/dealRoutes');
 app.use('/api/deals', dealRoutes);
 
+// Lightweight badge summary for the Navbar (no chat, pivot decision)
+const { protect } = require('./middleware/auth');
+const Offer = require('./models/Offer');
+const Deal = require('./models/Deal');
+
+app.get('/api/me/summary', protect, async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const [pendingOffersReceived, activeDeals] = await Promise.all([
+      Offer.countDocuments({ seller: userId, status: 'pending' }),
+      Deal.countDocuments({
+        $or: [{ buyer: userId }, { seller: userId }],
+        status: 'awaiting_handover',
+      }),
+    ]);
+    res.status(200).json({ success: true, pendingOffersReceived, activeDeals });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 // 404 handler for unmatched routes
 app.use((req, res, next) => {
   res.status(404).json({
