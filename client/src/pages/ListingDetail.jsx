@@ -159,7 +159,7 @@ const ListingDetail = () => {
       setOfferError('');
 
       await api.patch(`/offers/${myOffer.id || myOffer._id}/withdraw`);
-
+      window.dispatchEvent(new Event('app:refresh-summary'));
       setMyOffer(null);
       setReloadKey((value) => value + 1);
     } catch (err) {

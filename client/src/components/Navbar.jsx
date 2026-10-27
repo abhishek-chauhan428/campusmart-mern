@@ -46,9 +46,12 @@ const Navbar = () => {
 
     fetchSummary();
     const interval = setInterval(fetchSummary, 15000);
+    window.addEventListener('app:refresh-summary', fetchSummary);
+
     return () => {
       isMounted = false;
       clearInterval(interval);
+      window.removeEventListener('app:refresh-summary', fetchSummary);
     };
   }, [isAuthenticated, location.pathname]);
 

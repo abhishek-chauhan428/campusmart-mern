@@ -181,6 +181,7 @@ const Offers = () => {
 
     try {
       await api.patch(`/offers/${id}/${action}`);
+      window.dispatchEvent(new Event('app:refresh-summary'));
       await loadOffers();
       if (successMessage) {
         window.alert(successMessage);

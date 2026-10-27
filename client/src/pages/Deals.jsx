@@ -76,6 +76,7 @@ const Deals = () => {
 
     try {
       await api.patch(`/deals/${deal.id}/confirm`);
+      window.dispatchEvent(new Event('app:refresh-summary'));
       await loadDeals();
     } catch (err) {
       setActionError(getErrorMessage(err, 'Could not confirm the handover.'));
@@ -92,6 +93,7 @@ const Deals = () => {
 
     try {
       await api.patch(`/deals/${deal.id}/cancel`);
+      window.dispatchEvent(new Event('app:refresh-summary'));
       await loadDeals();
     } catch (err) {
       setActionError(getErrorMessage(err, 'Could not cancel the deal.'));

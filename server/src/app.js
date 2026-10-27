@@ -91,8 +91,11 @@ app.get('/api/me/summary', protect, async (req, res, next) => {
     const [pendingOffersReceived, activeDeals] = await Promise.all([
       Offer.countDocuments({ seller: userId, status: 'pending' }),
       Deal.countDocuments({
-        $or: [{ buyer: userId }, { seller: userId }],
         status: 'awaiting_handover',
+        $or: [
+          { buyer: userId, buyerConfirmed: false },
+          { seller: userId, sellerConfirmed: false },
+        ],
       }),
     ]);
     res.status(200).json({ success: true, pendingOffersReceived, activeDeals });
