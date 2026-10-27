@@ -258,7 +258,6 @@ const Deals = () => {
                               }
                               maxLength={500}
                               rows={3}
-                              placeholder="Where and when will you meet? Include the campus location and exchange details."
                               style={{
                                 width: '100%',
                                 resize: 'vertical',
