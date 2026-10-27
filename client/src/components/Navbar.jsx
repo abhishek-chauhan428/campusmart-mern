@@ -4,8 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import {
   ShoppingBag,
-  Heart,
-  ShoppingCart,
   User,
   LogOut,
   PlusCircle,
@@ -129,31 +127,8 @@ const Navbar = () => {
           )}
         </nav>
 
-        {/* Right Icon Actions - Exact reference style */}
+        {/* Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          
-          {/* Wishlist Heart Icon */}
-          <button className="btn-icon" title="Wishlist" aria-label="Wishlist">
-            <Heart size={21} strokeWidth={2} />
-          </button>
-
-          {/* Cart / Deals Shopping Bag Icon with notification dot */}
-          <Link
-            to={isAuthenticated ? "/deals" : "/login"}
-            className="btn-icon"
-            title="Cart & Deals"
-            aria-label="Cart"
-            style={{ position: 'relative' }}
-          >
-            <ShoppingCart size={21} strokeWidth={2} />
-            {summary.activeDeals > 0 && (
-              <span
-                className="notification-red-dot-icon"
-                title={`${summary.activeDeals} active deal${summary.activeDeals > 1 ? 's' : ''}`}
-              />
-            )}
-          </Link>
-
           {/* Auth Button or User Profile */}
           {isAuthenticated ? (
             <div style={{ position: 'relative' }}>
