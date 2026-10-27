@@ -5,6 +5,7 @@ const { validateObjectId } = require('../middleware/validate');
 const {
   getMyDeals,
   getDealById,
+  updateHandover,
   confirmDeal,
   cancelDeal,
 } = require('../controllers/dealController');
@@ -18,6 +19,13 @@ router.get(
   protect,
   validateObjectId('id'),
   getDealById
+);
+
+router.patch(
+  '/:id/handover',
+  protect,
+  validateObjectId('id'),
+  updateHandover
 );
 
 router.patch(

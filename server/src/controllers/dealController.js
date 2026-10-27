@@ -44,6 +44,57 @@ const getDealById = async (req, res, next) => {
   }
 };
 
+
+const updateHandover = async (req, res, next) => {
+  try {
+    const deal = await Deal.findById(req.params.id);
+
+    if (!deal) return fail(res, 404, 'Deal not found');
+
+    const userId = req.user._id.toString();
+    const isParticipant =
+      deal.buyer.toString() === userId ||
+      deal.seller.toString() === userId;
+
+    if (!isParticipant) {
+      return fail(res, 403, 'You are not a participant in this deal');
+    }
+
+    if (deal.status !== 'awaiting_handover') {
+      return fail(res, 409, `A ${deal.status} deal cannot be updated`);
+    }
+
+    const { handoverNote } = req.body || {};
+
+    if (typeof handoverNote !== 'string') {
+      return fail(res, 400, 'Handover details are required');
+    }
+
+    const note = handoverNote.trim();
+
+    if (!note) {
+      return fail(res, 400, 'Please enter the handover details');
+    }
+
+    if (note.length > 500) {
+      return fail(res, 400, 'Handover details must be at most 500 characters');
+    }
+
+    deal.handoverNote = note;
+    await deal.save();
+
+    const populated = await populateDeal(Deal.findById(deal._id));
+
+    res.status(200).json({
+      success: true,
+      message: 'Handover details saved',
+      deal: populated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const confirmDeal = async (req, res, next) => {
   try {
     const deal = await Deal.findById(req.params.id);
@@ -60,15 +111,6 @@ const confirmDeal = async (req, res, next) => {
 
     if (deal.status !== 'awaiting_handover') {
       return fail(res, 409, `A ${deal.status} deal cannot be confirmed`);
-    }
-
-    const { handoverNote } = req.body || {};
-
-    if (handoverNote !== undefined) {
-      if (typeof handoverNote !== 'string' || handoverNote.length > 500) {
-        return fail(res, 400, 'Handover note must be at most 500 characters');
-      }
-      deal.handoverNote = handoverNote.trim();
     }
 
     if (isBuyer) deal.buyerConfirmed = true;
@@ -162,6 +204,7 @@ const cancelDeal = async (req, res, next) => {
 module.exports = {
   getMyDeals,
   getDealById,
+  updateHandover,
   confirmDeal,
   cancelDeal,
 };

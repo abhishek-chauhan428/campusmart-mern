@@ -25,6 +25,7 @@ const Deals = () => {
   const [actionError, setActionError] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [notes, setNotes] = useState({});
+  const [editingHandover, setEditingHandover] = useState({});
 
   const loadDeals = async () => {
     setLoading(true);
@@ -44,14 +45,37 @@ const Deals = () => {
     loadDeals();
   }, []);
 
+  const saveHandover = async (deal) => {
+    const handoverNote = (notes[deal.id] || '').trim();
+
+    if (!handoverNote) {
+      setActionError('Please enter the handover details first.');
+      return;
+    }
+
+    setBusyId(deal.id);
+    setActionError('');
+
+    try {
+      await api.patch(`/deals/${deal.id}/handover`, { handoverNote });
+      setEditingHandover((current) => ({
+        ...current,
+        [deal.id]: false,
+      }));
+      await loadDeals();
+    } catch (err) {
+      setActionError(getErrorMessage(err, 'Could not save the handover details.'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const confirmDeal = async (deal) => {
     setBusyId(deal.id);
     setActionError('');
 
     try {
-      await api.patch(`/deals/${deal.id}/confirm`, {
-        handoverNote: notes[deal.id] || '',
-      });
+      await api.patch(`/deals/${deal.id}/confirm`);
       await loadDeals();
     } catch (err) {
       setActionError(getErrorMessage(err, 'Could not confirm the handover.'));
@@ -174,37 +198,24 @@ const Deals = () => {
                     </p>
                   </div>
 
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      Buyer
-                    </p>
-                    <p style={{ fontWeight: '700' }}>
-                      {buyerConfirmed ? 'Confirmed' : 'Waiting'}
-                    </p>
-                  </div>
 
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      Seller
-                    </p>
-                    <p style={{ fontWeight: '700' }}>
-                      {sellerConfirmed ? 'Confirmed' : 'Waiting'}
-                    </p>
-                  </div>
                 </div>
 
-                {deal.handoverNote && (
+                {deal.handoverNote && !editingHandover[deal.id] && (
                   <div
                     style={{
                       marginTop: '1rem',
-                      padding: '0.75rem',
+                      padding: '0.9rem',
                       background: '#f8fafc',
                       borderRadius: 'var(--radius-sm)',
                       fontSize: '0.875rem',
                       color: 'var(--text-secondary)',
                     }}
                   >
-                    <strong>Handover note:</strong> {deal.handoverNote}
+                    <div style={{ fontWeight: '700', marginBottom: '0.3rem' }}>
+                      Handover details
+                    </div>
+                    <div>{deal.handoverNote}</div>
                   </div>
                 )}
 
@@ -218,39 +229,92 @@ const Deals = () => {
                   >
                     {!currentUserConfirmed && (
                       <>
-                        <label
-                          htmlFor={`note-${deal.id}`}
-                          style={{
-                            display: 'block',
-                            fontSize: '0.8125rem',
-                            fontWeight: '600',
-                            marginBottom: '0.35rem',
-                          }}
-                        >
-                          Handover note
-                        </label>
+                        {editingHandover[deal.id] || !deal.handoverNote ? (
+                          <>
+                            <label
+                              htmlFor={`note-${deal.id}`}
+                              style={{
+                                display: 'block',
+                                fontSize: '0.8125rem',
+                                fontWeight: '600',
+                                marginBottom: '0.35rem',
+                              }}
+                            >
+                              Handover details
+                            </label>
 
-                        <textarea
-                          id={`note-${deal.id}`}
-                          value={notes[deal.id] || ''}
-                          onChange={(e) =>
-                            setNotes((current) => ({
-                              ...current,
-                              [deal.id]: e.target.value,
-                            }))
-                          }
-                          maxLength={500}
-                          rows={3}
-                          placeholder="Where and when did you hand over the item?"
-                          style={{
-                            width: '100%',
-                            resize: 'vertical',
-                            padding: '0.7rem',
-                            border: '1px solid var(--border-subtle)',
-                            borderRadius: 'var(--radius-sm)',
-                            fontFamily: 'inherit',
-                          }}
-                        />
+                            <textarea
+                              id={`note-${deal.id}`}
+                              value={
+                                notes[deal.id] !== undefined
+                                  ? notes[deal.id]
+                                  : deal.handoverNote || ''
+                              }
+                              onChange={(e) =>
+                                setNotes((current) => ({
+                                  ...current,
+                                  [deal.id]: e.target.value,
+                                }))
+                              }
+                              maxLength={500}
+                              rows={3}
+                              placeholder="Where and when will you meet? Include the campus location and exchange details."
+                              style={{
+                                width: '100%',
+                                resize: 'vertical',
+                                padding: '0.7rem',
+                                border: '1px solid var(--border-subtle)',
+                                borderRadius: 'var(--radius-sm)',
+                                fontFamily: 'inherit',
+                              }}
+                            />
+
+                            <div
+                              style={{
+                                display: 'flex',
+                                gap: '0.6rem',
+                                flexWrap: 'wrap',
+                                marginTop: '0.75rem',
+                              }}
+                            >
+                              <button
+                                className="btn btn-primary"
+                                onClick={() => saveHandover(deal)}
+                                disabled={busyId === deal.id}
+                              >
+                                {busyId === deal.id ? 'Saving...' : 'Save handover details'}
+                              </button>
+
+                              {deal.handoverNote && (
+                                <button
+                                  className="btn btn-outline"
+                                  onClick={() =>
+                                    setEditingHandover((current) => ({
+                                      ...current,
+                                      [deal.id]: false,
+                                    }))
+                                  }
+                                  disabled={busyId === deal.id}
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <button
+                            className="btn btn-outline"
+                            onClick={() =>
+                              setEditingHandover((current) => ({
+                                ...current,
+                                [deal.id]: true,
+                              }))
+                            }
+                            disabled={busyId === deal.id}
+                          >
+                            Edit handover details
+                          </button>
+                        )}
                       </>
                     )}
 
@@ -265,7 +329,11 @@ const Deals = () => {
                       <button
                         className="btn btn-primary"
                         onClick={() => confirmDeal(deal)}
-                        disabled={busyId === deal.id || currentUserConfirmed}
+                        disabled={
+                          busyId === deal.id ||
+                          currentUserConfirmed ||
+                          !deal.handoverNote
+                        }
                       >
                         <CheckCircle2 size={15} />
                         {currentUserConfirmed
