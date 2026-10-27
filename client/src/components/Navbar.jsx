@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 import {
   ShoppingBag,
   Heart,
@@ -19,8 +20,39 @@ import {
 const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [summary, setSummary] = useState({ pendingOffersReceived: 0, activeDeals: 0 });
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setSummary({ pendingOffersReceived: 0, activeDeals: 0 });
+      return;
+    }
+
+    let isMounted = true;
+    const fetchSummary = async () => {
+      try {
+        const { data } = await api.get('/me/summary');
+        if (isMounted && data?.success) {
+          setSummary({
+            pendingOffersReceived: data.pendingOffersReceived || 0,
+            activeDeals: data.activeDeals || 0,
+          });
+        }
+      } catch (err) {
+        // Silently ignore badge errors
+      }
+    };
+
+    fetchSummary();
+    const interval = setInterval(fetchSummary, 15000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isAuthenticated, location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -70,13 +102,23 @@ const Navbar = () => {
               <NavLink to="/listings/create" className={navLinkClass}>
                 Sell
               </NavLink>
-              <NavLink to="/my-offers" className={navLinkClass}>
+              <NavLink to="/my-offers" className={navLinkClass} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
                 Offers
+                {summary.pendingOffersReceived > 0 && (
+                  <span
+                    className="notification-red-dot"
+                    title={`${summary.pendingOffersReceived} pending offer${summary.pendingOffersReceived > 1 ? 's' : ''}`}
+                  />
+                )}
               </NavLink>
-              <NavLink to="/inbox" className={navLinkClass}>
-              </NavLink>
-              <NavLink to="/deals" className={navLinkClass}>
+              <NavLink to="/deals" className={navLinkClass} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
                 Deals
+                {summary.activeDeals > 0 && (
+                  <span
+                    className="notification-red-dot"
+                    title={`${summary.activeDeals} active deal${summary.activeDeals > 1 ? 's' : ''}`}
+                  />
+                )}
               </NavLink>
               {isAdmin && (
                 <NavLink to="/admin" className={navLinkClass} style={{ color: 'var(--accent-rose)', fontWeight: '700' }}>
@@ -95,10 +137,21 @@ const Navbar = () => {
             <Heart size={21} strokeWidth={2} />
           </button>
 
-          {/* Cart / Deals Shopping Bag Icon with badge */}
-          <Link to={isAuthenticated ? "/deals" : "/login"} className="btn-icon" title="Cart & Deals" aria-label="Cart">
+          {/* Cart / Deals Shopping Bag Icon with notification dot */}
+          <Link
+            to={isAuthenticated ? "/deals" : "/login"}
+            className="btn-icon"
+            title="Cart & Deals"
+            aria-label="Cart"
+            style={{ position: 'relative' }}
+          >
             <ShoppingCart size={21} strokeWidth={2} />
-            <span className="badge-count">0</span>
+            {summary.activeDeals > 0 && (
+              <span
+                className="notification-red-dot-icon"
+                title={`${summary.activeDeals} active deal${summary.activeDeals > 1 ? 's' : ''}`}
+              />
+            )}
           </Link>
 
           {/* Auth Button or User Profile */}
@@ -226,13 +279,17 @@ const Navbar = () => {
               <Link to="/listings/create" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)' }}>
                 Sell an Item
               </Link>
-              <Link to="/my-offers" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)' }}>
-                Offers
+              <Link to="/my-offers" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Offers</span>
+                {summary.pendingOffersReceived > 0 && (
+                  <span className="notification-red-dot" />
+                )}
               </Link>
-              <Link to="/inbox" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)' }}>
-              </Link>
-              <Link to="/deals" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)' }}>
-                Deals
+              <Link to="/deals" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Deals</span>
+                {summary.activeDeals > 0 && (
+                  <span className="notification-red-dot" />
+                )}
               </Link>
             </>
           )}
@@ -251,6 +308,31 @@ const Navbar = () => {
         .nav-link:hover, .nav-link.active {
           color: var(--brand-primary);
           font-weight: 600;
+        }
+        .notification-red-dot {
+          width: 7px;
+          height: 7px;
+          background-color: #ef4444;
+          border-radius: 50%;
+          display: inline-block;
+          margin-left: 5px;
+          box-shadow: 0 0 0 1.5px #ffffff;
+          animation: pulse-dot 2s infinite ease-in-out;
+        }
+        .notification-red-dot-icon {
+          position: absolute;
+          top: 3px;
+          right: 3px;
+          width: 8px;
+          height: 8px;
+          background-color: #ef4444;
+          border-radius: 50%;
+          border: 2px solid #ffffff;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes pulse-dot {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 0.85; }
         }
         @media (min-width: 768px) {
           .desktop-nav { display: flex !important; }
