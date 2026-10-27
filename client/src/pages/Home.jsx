@@ -88,7 +88,7 @@ const Home = () => {
                 marginBottom: '0.35rem',
                 textShadow: '0 1px 3px rgba(0,0,0,0.1)'
               }}>
-                DIRECT CHAT • FORMAL OFFERS
+                STRUCTURED & FORMAL OFFERS
               </div>
 
               <p style={{
