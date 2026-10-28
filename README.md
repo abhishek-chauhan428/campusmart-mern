@@ -2,6 +2,11 @@
 
 CampusMart is a MERN-based campus marketplace built for students to buy and sell items within their own college community.
 
+## 🚀 Demo & Deployment
+
+- 🎥 **Demo Video:** [Watch the CampusMart Demo](https://drive.google.com/file/d/16KgVZB2KXvX2SSPKoHZWQQZ-bOuk40Qs/view?usp=sharing)
+- 🌐 **Live Demo:** [CampusMart – Deployed Application](https://campusmart-mern.vercel.app/)
+
 The application is designed around a simple but complete marketplace workflow:
 
 ```text
