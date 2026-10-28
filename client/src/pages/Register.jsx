@@ -135,7 +135,7 @@ const Register = () => {
                 type="text"
                 required
                 className="form-input"
-                placeholder="Abhishek Chauhan"
+                placeholder="John Doe"
                 value={formData.name}
                 onChange={handleChange}
                 style={{ paddingLeft: '2.5rem' }}
